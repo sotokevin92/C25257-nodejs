@@ -3,9 +3,32 @@ const rl = require('readline').createInterface({
   output: process.stdout
 });
 
-const datosCliente = {
-    pin: '1234',
-    saldo: 0
+const fs = require('fs');
+
+const datosCliente = cargarDatosCliente();
+
+function cargarDatosCliente() {
+    try {
+        return JSON.parse(fs.readFileSync('./cajero.json').toString());
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            console.warn('Archivo de cliente no encontrado. Se utilizarán valores predeterminados.');
+            return {
+                pin: '1234',
+                saldo: 0
+            }
+        }
+
+        throw error;
+    }
+}
+
+function guardarDatosCliente() {
+    try {
+        fs.writeFileSync('./cajero.json', JSON.stringify(datosCliente));
+    } catch (error) {
+        console.warn('Ocurrió un error guardando los datos del cliente.');
+    }
 }
 
 const demoraMensaje = 500;
@@ -87,6 +110,8 @@ function depositar() {
         datosCliente.saldo += montoFloat;
         console.log(`> Se ha depositado $${montoFloat.toFixed(2)}`);
 
+        guardarDatosCliente();
+
         setTimeout(principal, demoraMensaje);
     });
 }
@@ -108,6 +133,9 @@ function retirar() {
 
         datosCliente.saldo -= montoFloat;
         console.log(`> Se ha retirado $${montoFloat.toFixed(2)}`);
+
+        guardarDatosCliente();
+
         setTimeout(principal, demoraMensaje);
     })
 }
