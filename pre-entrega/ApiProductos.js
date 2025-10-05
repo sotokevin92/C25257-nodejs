@@ -22,7 +22,7 @@ export class ApiProductos {
         }
 
         if (!result.ok) {
-            throw new Error('La petición a la API de FakeStore no es válida.');
+            throw new Error(`La petición a la API de FakeStore no es válida. Error ${result.status}.`);
         }
 
         try {
