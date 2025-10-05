@@ -8,8 +8,8 @@ function procesarArgumentos() {
     const metodosSoportados = ['GET', 'POST', 'DELETE'];
     const recursosDisponibles = ['products'];
 
-    if (!metodo && !recurso) {
-        throw new Error('¡Uso incorrecto! Se requiere método (GET, POST, DELETE) y recurso.');
+    if (!metodo || !recurso) {
+        throw new Error(`Se requiere método (${metodosSoportados.join(', ')}) y recurso.`);
     }
 
     if (!metodosSoportados.includes(metodo)) {
