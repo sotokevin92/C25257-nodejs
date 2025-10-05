@@ -1,3 +1,5 @@
+import { ApiProductos } from "./ApiProductos.js";
+
 // Obtener argumentos de la terminal
 const [, , metodo, recurso, ...parametros] = process.argv;
 const [nombreRecurso, idRecurso] = recurso?.split('/');
@@ -42,52 +44,9 @@ function obtenerParametros(recurso) {
     }
 }
 
-async function peticionApi(metodo = 'GET', url, body) {
-    let result;
-    try {
-        result = await fetch(`https://fakestoreapi.com${url}`, {
-            method: metodo,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: body ? JSON.stringify(body) : null
-        });
-    } catch (error) {
-        throw new Error(`Error durante la petición a la API de FakeStore: ${error.message}`);
-    }
-
-    if (!result.ok) {
-        throw new Error('La petición a la API de FakeStore no es válida.');
-    }
-
-    try {
-        return await result.json();
-    } catch (error) {
-        throw new Error('No se pudo interpretar la respuesta de la API. Es probable que el contenido solicitado no esté disponible.');
-    }
-}
-
-async function obtenerProductos() {
-    return await peticionApi('GET', '/products');
-}
-
-async function obtenerProducto(id) {
-    return await peticionApi('GET', `/products/${id}`);
-}
-
-async function crearProducto({ title, price, category }) {
-    return await peticionApi('POST', '/products', {
-        title,
-        price,
-        category,
-    });
-}
-
-async function eliminarProducto(id) {
-    return await peticionApi('DELETE', `/products/${id}`);
-}
-
 // Programa principal
+
+const api = new ApiProductos();
 
 // Tenemos operaciones que no necesariamente requieren un ID, así que las categorizamos así
 const operacion = [metodo, nombreRecurso].join(' ');
@@ -101,16 +60,16 @@ try {
         case 'GET products': {
             // El ID es opcional en esta operación
             if (idRecurso) {
-                salida = await obtenerProducto(idRecurso);
+                salida = await api.obtenerProducto(idRecurso);
                 break;
             }
 
-            salida = await obtenerProductos();
+            salida = await api.obtenerProductos();
             break;
         }
         case 'POST products': {
             const parametros = obtenerParametros('products');
-            salida = await crearProducto(parametros);
+            salida = await api.crearProducto(parametros);
             break;
         }
         case 'DELETE products': {
@@ -120,7 +79,7 @@ try {
                 process.exit(1);
             }
 
-            salida = await eliminarProducto(idRecurso);
+            salida = await api.eliminarProducto(idRecurso);
             break;
         }
         default:
