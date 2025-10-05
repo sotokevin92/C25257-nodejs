@@ -37,22 +37,16 @@ let salida;
 try {
     switch (operacion) {
         case 'GET products': {
-            // El ID es opcional en esta operación
-            if (idRecurso) {
-                salida = await api.obtenerProducto(idRecurso);
-                break;
-            }
-
-            salida = await api.obtenerProductos();
+            salida = await api.obtener(idRecurso);
             break;
         }
         case 'POST products': {
             const [title, price, category] = parametros;
-            salida = await api.crearProducto({ title, price, category });
+            salida = await api.crear({ title, price, category });
             break;
         }
         case 'DELETE products': {
-            salida = await api.eliminarProducto(idRecurso);
+            salida = await api.eliminar(idRecurso);
             break;
         }
         default:

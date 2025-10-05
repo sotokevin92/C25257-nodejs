@@ -32,19 +32,19 @@ export class ApiProductos {
         }
     }
 
-    async obtenerProductos() {
-        return await this.peticion('GET', '/products');
-    }
+    async obtener(id) {
+        if (!id) {
+            return await this.peticion('GET', '/products');
+        }
 
-    async obtenerProducto(id) {
         if (!validarId(id)) {
-            throw new Error('Se requiere un ID para obtener un producto específico.');
+            throw new Error('El ID solicitado no es válido.');
         }
 
         return await this.peticion('GET', `/products/${id}`);
     }
 
-    async crearProducto({ title, price, category }) {
+    async crear({ title, price, category }) {
         if (!title || !price || !category) {
             throw new Error('Los parámetros son incorrectos. Se requieren title, price y category.')
         }
@@ -60,9 +60,9 @@ export class ApiProductos {
         });
     }
 
-    async eliminarProducto(id) {
+    async eliminar(id) {
         if (!validarId(id)) {
-            throw new Error('Se requiere un ID para eliminar un producto.');
+            throw new Error('Se requiere un ID válido para eliminar un producto.');
         }
 
         return await this.peticion('DELETE', `/products/${id}`);
