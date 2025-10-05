@@ -25,7 +25,7 @@ function procesarArgumentos() {
 
 let argumentos;
 try {
-    argumentos = procesarArgumentos(process.argv);
+    argumentos = procesarArgumentos();
 } catch (error) {
     console.error('Argumentos incorrectos:', error.message);
     process.exit(1);
