@@ -23,27 +23,6 @@ if (!recursosDisponibles.includes(nombreRecurso)) {
     process.exit(1);
 }
 
-// Funciones auxiliares
-function obtenerParametros(recurso) {
-    if (recurso === 'products') {
-        const [title, price, category] = parametros;
-
-        if (!title || !price || !category) {
-            throw new Error('Los parámetros son incorrectos. Se requieren title, price y category.')
-        }
-
-        if (Number.isNaN(price) || price <= 0) {
-            throw new Error('El precio ingresado no es válido.');
-        }
-
-        return {
-            title,
-            price: Number(price),
-            category,
-        }
-    }
-}
-
 // Programa principal
 
 const api = new ApiProductos();
@@ -68,17 +47,11 @@ try {
             break;
         }
         case 'POST products': {
-            const parametros = obtenerParametros('products');
-            salida = await api.crearProducto(parametros);
+            const [title, price, category] = parametros;
+            salida = await api.crearProducto({ title, price, category });
             break;
         }
         case 'DELETE products': {
-            // El ID es obligatorio en esta operación
-            if (!idRecurso) {
-                console.error('Se requiere un ID para eliminar un producto.');
-                process.exit(1);
-            }
-
             salida = await api.eliminarProducto(idRecurso);
             break;
         }

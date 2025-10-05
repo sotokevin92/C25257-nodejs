@@ -1,3 +1,7 @@
+function validarId(id) {
+    return !Number.isNaN(id) && id > 0;
+}
+
 export class ApiProductos {
     constructor() {
         this.baseUrl = 'https://fakestoreapi.com';
@@ -33,10 +37,22 @@ export class ApiProductos {
     }
 
     async obtenerProducto(id) {
+        if (!validarId(id)) {
+            throw new Error('Se requiere un ID para obtener un producto específico.');
+        }
+
         return await this.peticion('GET', `/products/${id}`);
     }
 
     async crearProducto({ title, price, category }) {
+        if (!title || !price || !category) {
+            throw new Error('Los parámetros son incorrectos. Se requieren title, price y category.')
+        }
+
+        if (Number.isNaN(price) || price <= 0) {
+            throw new Error('El precio ingresado no es válido. Debe ser un número positivo.');
+        }
+
         return await this.peticion('POST', '/products', {
             title,
             price,
@@ -45,6 +61,10 @@ export class ApiProductos {
     }
 
     async eliminarProducto(id) {
+        if (!validarId(id)) {
+            throw new Error('Se requiere un ID para eliminar un producto.');
+        }
+
         return await this.peticion('DELETE', `/products/${id}`);
     }
 }
