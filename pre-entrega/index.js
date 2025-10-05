@@ -1,63 +1,68 @@
 import { ApiProductos } from "./ApiProductos.js";
 
-// Obtener argumentos de la terminal
-const [, , metodo, recurso, ...parametros] = process.argv;
-const [nombreRecurso, idRecurso] = recurso?.split('/');
+function procesarArgumentos() {
+    // Obtener argumentos de la terminal, omitir los dos primeros, que son node y la ruta a este script
+    const [, , metodo, recurso, ...parametrosAdicionales] = process.argv;
+    const [nombreRecurso, idRecurso] = recurso?.split('/');
 
-const metodosSoportados = ['GET', 'POST', 'DELETE'];
-const recursosDisponibles = ['products'];
+    const metodosSoportados = ['GET', 'POST', 'DELETE'];
+    const recursosDisponibles = ['products'];
 
-// Fallos inmediatos
-if (!metodo && !recurso) {
-    console.error('¡Uso incorrecto! Se requiere método (GET, POST, DELETE) y recurso.');
-    process.exit(1);
+    if (!metodo && !recurso) {
+        throw new Error('¡Uso incorrecto! Se requiere método (GET, POST, DELETE) y recurso.');
+    }
+
+    if (!metodosSoportados.includes(metodo)) {
+        throw new Error(`El método ${metodo} no es válido. Utilice uno de los siguientes: ${metodosSoportados.join(', ')}`);
+    }
+
+    if (!recursosDisponibles.includes(nombreRecurso)) {
+        throw new Error(`El recurso ${nombreRecurso} no está disponible. Utilice uno de los siguientes: ${recursosDisponibles.join(', ')}`);
+    }
+
+    return { metodo, parametrosAdicionales, nombreRecurso, idRecurso }
 }
 
-if (!metodosSoportados.includes(metodo)) {
-    console.error(`El método ${metodo} no es válido. Utilice uno de los siguientes: ${metodosSoportados.join(', ')}`);
-    process.exit(1);
-}
-
-if (!recursosDisponibles.includes(nombreRecurso)) {
-    console.error(`El recurso ${nombreRecurso} no está disponible. Utilice uno de los siguientes: ${recursosDisponibles.join(', ')}`);
-    process.exit(1);
-}
-
-// Programa principal
-
-const api = new ApiProductos();
-
-// Tenemos operaciones que no necesariamente requieren un ID, así que las categorizamos así
-const operacion = [metodo, nombreRecurso].join(' ');
-
-// La semántica dicta que esto es un string, pero lo estamos asignando al resultado de las consultas
-let salida;
-
-// Envolver en try-catch para capturar excepciones
+let argumentos;
 try {
+    argumentos = procesarArgumentos(process.argv);
+} catch (error) {
+    console.error('Argumentos incorrectos:', error.message);
+    process.exit(1);
+}
+
+let resultado;
+try {
+    const { metodo, nombreRecurso, idRecurso, parametrosAdicionales } = argumentos;
+
+    const api = new ApiProductos();
+
+    // Tenemos operaciones que no necesariamente requieren un ID, así que las categorizamos así
+    const operacion = [metodo, nombreRecurso].join(' ');
+
     switch (operacion) {
         case 'GET products': {
-            salida = await api.obtener(idRecurso);
+            resultado = await api.obtener(idRecurso);
             break;
         }
         case 'POST products': {
-            const [title, price, category] = parametros;
-            salida = await api.crear({ title, price, category });
+            const [title = '', price = '', category = ''] = parametrosAdicionales;
+            resultado = await api.crear({ title, price, category });
             break;
         }
         case 'DELETE products': {
-            salida = await api.eliminar(idRecurso);
+            resultado = await api.eliminar(idRecurso);
             break;
         }
         default:
             // Con las validaciones previas no deberíamos caer acá
             console.error(`Operación no soportada: ${operacion}`);
-            process.exit(2);
+            process.exit(3);
     }
 } catch (error) {
     console.error(`Error al intentar realizar la operación: ${error.message}`);
-    process.exit(1);
+    process.exit(2);
 }
 
-console.log(salida);
+console.log(resultado);
 process.exit(0);
