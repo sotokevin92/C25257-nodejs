@@ -4,9 +4,6 @@ const PORT = 3000;
 
 const app = express();
 
-app.get('/ping', (_req, res) => {
-    return res.send('/pong');
-});
 const noEncontrado = (_req, res) => {
     return res.json({
         mensaje: 'No se encontró el recurso solicitado'
