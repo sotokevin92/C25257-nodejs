@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import personasController from "./routes/personas.routes.js";
+import personasController from "./routes/personasRoutes.js";
 
 const PORT = 3000;
 

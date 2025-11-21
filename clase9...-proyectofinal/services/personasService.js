@@ -21,30 +21,9 @@ const personas = [
     {id: 20, name: 'Javier', age: 44}
 ];
 
+export const getPersonas = () => personas;
 
-export const getPersonas = (req, res) => {
-    let { edadMinima, edadMaxima } = req.query;
+export const getPersonasByAge = (minAge, maxAge) =>
+    personas.filter(persona => (minAge ? persona.age >= minAge : true) && (maxAge ? persona.age <= maxAge : true));
 
-    if (isNaN(edadMinima) || edadMinima <= 0) {
-        edadMinima = 0;
-    }
-
-    if (isNaN(edadMaxima) || edadMaxima <= 0) {
-        edadMaxima = Infinity;
-    }
-
-    return res.json(personas.filter(
-        p => p.age >= edadMinima && p.age <= edadMaxima
-    ));
-};
-
-export const getPersona = (req, res) => {
-    const { id } = req.params;
-    const persona = personas.find(p => p.id === Number(id));
-
-    if (!persona) {
-        throw new Error('Persona no encontrada');
-    }
-
-    return res.json(persona);
-};
+export const getPersonaById = (id) => personas.find(persona => persona.id === id);

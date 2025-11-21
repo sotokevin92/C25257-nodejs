@@ -1,4 +1,4 @@
-import {getPersona, getPersonas} from "../controllers/personas.controller.js";
+import {getPersona, getPersonas} from "../controllers/personasController.js";
 
 export default (router) => {
     router.get('/', (req, res) => {
